@@ -17,3 +17,14 @@ export interface IUniversityClass {
   status: string;
   semester: string;
 }
+
+/**
+ * This represents an assignment returned by the API
+ */
+export interface IUniversityAssignment {
+  assignmentID: string;
+  classID: string;
+  date: string;
+  weight: BigInteger;
+}
+

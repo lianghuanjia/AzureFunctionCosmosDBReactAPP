@@ -4,7 +4,7 @@ import { Select, Typography } from "@mui/material";
 /**
  * You will find globals from this file useful!
  */
-import {} from "./globals";
+import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "./globals";
 import { IUniversityClass } from "./types/api_types";
 
 function App() {
@@ -33,6 +33,88 @@ function App() {
     const json = await res.json();
     console.log(json);
   };
+
+  const enrollANewStudent = async () => {
+    const response = await fetch(BASE_API_URL + STUDENT_URL,{
+      method: 'POST',
+      body: JSON.stringify({
+        "dateEnrolled": "2000-01-23T04:56:07+00:00",
+        "name": "Andrew F. Rosas",
+        "status": "enrolled",
+        "universityId": "U1234567"
+      }),
+      headers: {
+        'Content-type': 'application/json',
+        'x-functions-key': TOKEN
+      },
+    })
+
+    const data = await response.json()
+
+    console.log(data)
+  }
+
+  // const getStudentById = async () => {
+  //   const response = await fetch(BASE_API_URL + STUDENT_URL+"/GetById/"+new URLSearchParams({
+  //     buid: MY_BU_ID,
+  //     studentId:"U1234567"
+  //   }),{
+  //     method: 'GET',
+  //   })
+
+  //   const data = await response.json()
+  //   console.log(data)
+  // }
+
+  const findByStatus = async () => {
+    const response = await fetch(BASE_API_URL+STUDENT_URL+"/findByStatus/enrolled?"+new URLSearchParams({
+      buid: MY_BU_ID,
+    }),{
+      method: 'GET',
+      headers: {
+        'Content-Type':'application/json',
+        'x-functions-key': TOKEN
+      },
+    })
+
+    const data = await response.json()
+    console.log(data)
+  }
+
+
+  //class/listBySemester/{semester}
+  const listBySemester = async () => {
+    //https://dscs519-assessment.azurewebsites.net/api/class/listBySemester/fall2022?buid=U62794192
+    const response = await fetch(BASE_API_URL+CLASS_URL+"/listBySemester/fall2022?"+new URLSearchParams({
+      buid: MY_BU_ID
+    }),{
+      method: 'GET',
+      headers: {
+        'Content-Type':'application/json',
+        'x-functions-key': TOKEN
+      },
+    })
+
+    const data = await response.json()
+    console.log(data)
+  }
+
+  //class/listStudents/{classId}
+  const listStudentsByClassId = async () => {
+    const response = await fetch(BASE_API_URL+CLASS_URL+"/listStudents/C123?"+new URLSearchParams({
+      buid: MY_BU_ID
+    }),{
+      method: 'GET',
+      headers: GET_DEFAULT_HEADERS(),
+      });
+
+    const data = await response.json()
+    console.log(data)
+  }
+
+  listStudentsByClassId()
+
+  
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
