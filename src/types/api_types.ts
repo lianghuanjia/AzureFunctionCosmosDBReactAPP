@@ -22,7 +22,20 @@ export interface student{
   classId: string;
   studentId: string;
   name: string;
-  grades: [grade];
+  grades: {
+    A1: number,
+    A2: number,
+    A3: number,
+    A4: number,
+    A5: number
+  };
+}
+
+export interface assignment{
+  assignmentId: string,
+  classId: string,
+  date: string,
+  weight: number
 }
 
 export interface grade{

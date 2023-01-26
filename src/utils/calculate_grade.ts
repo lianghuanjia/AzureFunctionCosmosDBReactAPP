@@ -6,7 +6,7 @@
  *
  * Anything that has a type of "undefined" you will need to replace with something.
  */
-import { IUniversityClass, student } from "../types/api_types";
+import { IUniversityClass, student, assignment, grade} from "../types/api_types";
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "../globals";
 
 /**
@@ -62,8 +62,31 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
   //   console.log(student)
   // }
 
+  let assignmentsWeight = new Map();
+  const res = await fetch(BASE_API_URL+CLASS_URL+"listAssignments/"+classID+"/?"+new URLSearchParams({
+    buid: MY_BU_ID
+  }),{
+    method: 'GET',
+    headers: GET_DEFAULT_HEADERS(),
+    });
+
+  const jsonResponse = await res.json();
+
+  for(var assignment of jsonResponse){
+    assignmentsWeight.set(assignment.assignmentId, assignment.weight);
+  }
+
+  // console.log(assignmentsWeight.get("A1"));
+
+
   for(var student of students){
-    console.log(student.grades);
+    var totalScore = 0;
+    var grades = Object.entries(student.grades[0])
+    console.log(grades);
+    for(var eachGrade of grades){
+      // totalScore += assignmentsWeight.get(grade.)
+      console.log(eachGrade[1]);
+    }
   }
 
 
