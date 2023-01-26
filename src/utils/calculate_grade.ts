@@ -6,7 +6,7 @@
  *
  * Anything that has a type of "undefined" you will need to replace with something.
  */
-import { IUniversityClass, student, assignment, grade} from "../types/api_types";
+import { IUniversityClass, student, assignment, grade, oneStudentFinalResult} from "../types/api_types";
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "../globals";
 
 /**
@@ -31,7 +31,7 @@ export async function calculateStudentFinalGrade(
  * @param classID The ID of the class for which we want to calculate the final grades
  * @returns Some data structure that has a list of each student and their final grade.
  */
-export async function calcAllFinalGrade(classID: string): Promise<undefined> {
+export async function calcAllFinalGrade(classID: string, classTitle: string, currSemester: string): Promise<undefined> {
   const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+classID+"/?"+new URLSearchParams({
     buid: MY_BU_ID
   }),{
@@ -78,15 +78,31 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
 
   // console.log(assignmentsWeight.get("A1"));
 
+  let returnList!: oneStudentFinalResult[];
 
   for(var student of students){
     var totalScore = 0;
-    var grades = Object.entries(student.grades[0])
-    console.log(grades);
+    var grades = Object.entries(student.grades[0]) //grade: A1:80(weight)
     for(var eachGrade of grades){
-      // totalScore += assignmentsWeight.get(grade.)
-      console.log(eachGrade[1]);
+      var weight = assignmentsWeight.get(eachGrade[0]);
+      var assignmentGrade = eachGrade[1];
+      if(typeof eachGrade[1] === "string"){
+        assignmentGrade = parseInt(eachGrade[1]);
+      }
+      if(typeof assignmentGrade === "number"){
+        totalScore += weight*assignmentGrade;
+      }
     }
+    totalScore = totalScore / 100;
+    let o: oneStudentFinalResult,{
+      studentId: student.studentId;
+      studentName: student.name;
+      classId: classID;
+      className: classTitle;
+      semester: currSemester;
+      finalGrade: totalScore;
+    }
+    returnList.push
   }
 
 

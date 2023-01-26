@@ -49,5 +49,14 @@ export interface assignmentWeight{
   weight: BigInt;
 }
 
+export interface oneStudentFinalResult{
+  studentId: string;
+  studentName: string;
+  classId: string;
+  className: string;
+  semester: string;
+  finalGrade: number;
+}
+
 
 

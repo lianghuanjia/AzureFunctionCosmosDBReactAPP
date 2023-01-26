@@ -8,11 +8,14 @@ import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TO
 import { IUniversityClass } from "./types/api_types";
 import { countReset } from "console";
 import {calcAllFinalGrade} from "./utils/calculate_grade";
+import {GradeTable} from "./components/GradeTable";
 
 function App() {
   // You will need to use more of these!
   const [currClassId, setCurrClassId] = useState<string>("");
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
+  const [currClassName, setCurrClassName] = useState<string>("");
+  const [currSemester, setCurrSemester] = useState<string>("");
 
   /**
    * This is JUST an example of how you might fetch some data(with a different API).
@@ -36,58 +39,14 @@ function App() {
     console.log(json);
   };
 
-  const enrollANewStudent = async () => {
-    const response = await fetch(BASE_API_URL + STUDENT_URL,{
-      method: 'POST',
-      body: JSON.stringify({
-        "dateEnrolled": "2000-01-23T04:56:07+00:00",
-        "name": "Andrew F. Rosas",
-        "status": "enrolled",
-        "universityId": "U1234567"
-      }),
-      headers: {
-        'Content-type': 'application/json',
-        'x-functions-key': TOKEN
-      },
-    })
-
-    const data = await response.json()
-
-    console.log(data)
-  }
-
-  // const getStudentById = async () => {
-  //   const response = await fetch(BASE_API_URL + STUDENT_URL+"/GetById/"+new URLSearchParams({
-  //     buid: MY_BU_ID,
-  //     studentId:"U1234567"
-  //   }),{
-  //     method: 'GET',
-  //   })
-
-  //   const data = await response.json()
-  //   console.log(data)
-  // }
-
-  const findByStatus = async () => {
-    const response = await fetch(BASE_API_URL+STUDENT_URL+"findByStatus/enrolled?"+new URLSearchParams({
-      buid: MY_BU_ID,
-    }),{
-      method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'x-functions-key': TOKEN
-      },
-    })
-
-    const data = await response.json()
-    console.log(data)
-  }
 
 
   //class/listBySemester/{semester}
   const listBySemester = async () => {
+    var semester = "fall2022";
+    setCurrSemester(semester);
     //https://dscs519-assessment.azurewebsites.net/api/class/listBySemester/fall2022?buid=U62794192
-    const response = await fetch(BASE_API_URL+CLASS_URL+"listBySemester/fall2022?"+new URLSearchParams({
+    const response = await fetch(BASE_API_URL+CLASS_URL+"listBySemester/"+semester+"?"+new URLSearchParams({
       buid: MY_BU_ID
     }),{
       method: 'GET',
@@ -122,7 +81,7 @@ function App() {
 
   useEffect(() => {
     // run something every time name changes
-    calcAllFinalGrade(currClassId);
+    const result = calcAllFinalGrade(currClassId, currClassName, currSemester); //use props to pass the result to component GradeTable
   }, [currClassId]);
 
   return (
@@ -143,11 +102,8 @@ function App() {
               const selectedClass = classList.filter(c => c.classId === selectedValue)[0]
               console.log(selectedClass.classId)
               setCurrClassId(selectedClass.classId)
-            
+              setCurrClassName(selectedClass.title)
             }}>
-            
-        
-
             {classList.map((IUniversityClass) => 
               <MenuItem key={IUniversityClass.title} value={IUniversityClass.classId}>
                 {IUniversityClass.classId}
@@ -160,7 +116,7 @@ function App() {
           <Typography variant="h4" gutterBottom>
             Final Grades
           </Typography>
-          <div>Place the grade table here</div>
+          <div><GradeTable /></div>
         </Grid>
       </Grid>
     </div>

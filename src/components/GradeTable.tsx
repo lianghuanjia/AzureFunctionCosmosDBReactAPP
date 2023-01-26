@@ -15,7 +15,25 @@ export function dummyData() {
  *
  * You might need to change the signature of this function.
  *
+ * This is a component, need to apply it to the div below the typography in the App.tsx
  */
 export const GradeTable = () => {
-  return <></>;
+  return (
+  <table >
+  <tr>
+    <th>Company</th>
+    <th>Contact</th>
+    <th>Country</th>
+  </tr>
+  <tr>
+    <td>Alfreds Futterkiste</td>
+    <td>Maria Anders</td>
+    <td>Germany</td>
+  </tr>
+  <tr>
+    <td>Centro comercial Moctezuma</td>
+    <td>Francisco Chang</td>
+    <td>Mexico</td>
+  </tr>
+</table>);
 };
