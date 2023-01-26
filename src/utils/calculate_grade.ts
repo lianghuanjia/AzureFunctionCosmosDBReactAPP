@@ -6,7 +6,7 @@
  *
  * Anything that has a type of "undefined" you will need to replace with something.
  */
-import { IUniversityClass } from "../types/api_types";
+import { IUniversityClass, student } from "../types/api_types";
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "../globals";
 
 /**
@@ -40,8 +40,33 @@ export async function calcAllFinalGrade(classID: string): Promise<undefined> {
     });
 
   const data = await response.json()
-  console.log(data);
+
+  //use a list to store all the data and return it.
+
+  var students = [];
+  for (var studentID of data) {
+    const studentInfo = await fetch(BASE_API_URL+STUDENT_URL+"listGrades/"+studentID+"/"+classID+"/?"+new URLSearchParams({
+      buid: MY_BU_ID
+    }),{
+      method: 'GET',
+      headers: GET_DEFAULT_HEADERS(),
+      });
+  
+    const student = await studentInfo.json();
+    students.push(student);
+  }
+
+  // console.log(students)
+
+  // for(var student in students){
+  //   console.log(student)
+  // }
+
+  for(var student of students){
+    console.log(student.grades);
+  }
 
 
   return undefined;
 }
+

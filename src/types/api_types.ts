@@ -18,13 +18,23 @@ export interface IUniversityClass {
   semester: string;
 }
 
-/**
- * This represents an assignment returned by the API
- */
-export interface IUniversityAssignment {
-  assignmentID: string;
-  classID: string;
-  date: string;
-  weight: BigInteger;
+export interface student{
+  classId: string;
+  studentId: string;
+  name: string;
+  grades: [grade];
 }
+
+export interface grade{
+  assignmentName: string;
+  score: string;
+}
+
+export interface assignmentWeight{
+  assignmentID: string;
+  classId: string;
+  weight: BigInt;
+}
+
+
 
