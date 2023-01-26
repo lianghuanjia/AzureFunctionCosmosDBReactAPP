@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Select, Typography } from "@mui/material";
+import { MenuItem, Select, Typography } from "@mui/material";
 /**
  * You will find globals from this file useful!
  */
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "./globals";
 import { IUniversityClass } from "./types/api_types";
+import { countReset } from "console";
+import {calcAllFinalGrade} from "./utils/calculate_grade";
 
 function App() {
   // You will need to use more of these!
@@ -67,7 +69,7 @@ function App() {
   // }
 
   const findByStatus = async () => {
-    const response = await fetch(BASE_API_URL+STUDENT_URL+"/findByStatus/enrolled?"+new URLSearchParams({
+    const response = await fetch(BASE_API_URL+STUDENT_URL+"findByStatus/enrolled?"+new URLSearchParams({
       buid: MY_BU_ID,
     }),{
       method: 'GET',
@@ -85,7 +87,7 @@ function App() {
   //class/listBySemester/{semester}
   const listBySemester = async () => {
     //https://dscs519-assessment.azurewebsites.net/api/class/listBySemester/fall2022?buid=U62794192
-    const response = await fetch(BASE_API_URL+CLASS_URL+"/listBySemester/fall2022?"+new URLSearchParams({
+    const response = await fetch(BASE_API_URL+CLASS_URL+"listBySemester/fall2022?"+new URLSearchParams({
       buid: MY_BU_ID
     }),{
       method: 'GET',
@@ -97,11 +99,12 @@ function App() {
 
     const data = await response.json()
     console.log(data)
+    setClassList(data)
   }
 
   //class/listStudents/{classId}
   const listStudentsByClassId = async () => {
-    const response = await fetch(BASE_API_URL+CLASS_URL+"/listStudents/C123?"+new URLSearchParams({
+    const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+currClassId+"/?"+new URLSearchParams({
       buid: MY_BU_ID
     }),{
       method: 'GET',
@@ -112,9 +115,15 @@ function App() {
     console.log(data)
   }
 
-  listStudentsByClassId()
 
-  
+  useEffect(() => {
+    listBySemester();
+  }, []);
+
+  useEffect(() => {
+    // run something every time name changes
+    calcAllFinalGrade(currClassId);
+  }, [currClassId]);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -129,8 +138,21 @@ function App() {
             Select a class
           </Typography>
           <div style={{ width: "100%" }}>
-            <Select fullWidth={true} label="Class">
-              {/* You'll need to place some code here to generate the list of items in the selection */}
+            <Select fullWidth={true} label="Class" onChange={(e) => {
+              const selectedValue = e.target.value
+              const selectedClass = classList.filter(c => c.classId === selectedValue)[0]
+              console.log(selectedClass.classId)
+              setCurrClassId(selectedClass.classId)
+            
+            }}>
+            
+        
+
+            {classList.map((IUniversityClass) => 
+              <MenuItem key={IUniversityClass.title} value={IUniversityClass.classId}>
+                {IUniversityClass.classId}
+              </MenuItem>
+            )}
             </Select>
           </div>
         </Grid>
