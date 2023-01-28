@@ -1,3 +1,6 @@
+import {oneStudentFinalResult} from "../types/api_types";
+
+
 /**
  * You might find it useful to have some dummy data for your own testing.
  * Feel free to write this function if you find that feature desirable.
@@ -16,12 +19,16 @@ export function dummyData() {
  * You might need to change the signature of this function.
  *
  * This is a component, need to apply it to the div below the typography in the App.tsx
- */
-export const GradeTable = () => {
+ */ 
+export const GradeTable = (infoList: oneStudentFinalResult[]) => {
+  for(var a of infoList){
+    console.log(a);
+  }
+
   return (
   <table >
   <tr>
-    <th>Company</th>
+    <th>Student</th>
     <th>Contact</th>
     <th>Country</th>
   </tr>

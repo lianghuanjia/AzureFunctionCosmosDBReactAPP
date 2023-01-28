@@ -18,17 +18,17 @@ export interface IUniversityClass {
   semester: string;
 }
 
+//use typescript map to do this dynamically. Take a look how // map<string, number>[]
+// A1: number,
+// A2: number,
+// A3: number,
+// A4: number,
+// A5: number
 export interface student{
   classId: string;
   studentId: string;
   name: string;
-  grades: {
-    A1: number,
-    A2: number,
-    A3: number,
-    A4: number,
-    A5: number
-  };
+  grades: Map<string,number>[];
 }
 
 export interface assignment{

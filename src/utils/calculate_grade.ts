@@ -31,7 +31,7 @@ export async function calculateStudentFinalGrade(
  * @param classID The ID of the class for which we want to calculate the final grades
  * @returns Some data structure that has a list of each student and their final grade.
  */
-export async function calcAllFinalGrade(classID: string, classTitle: string, currSemester: string): Promise<undefined> {
+export async function calcAllFinalGrade(classID: string, classTitle: string, currSemester: string): Promise<oneStudentFinalResult[]> {
   const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+classID+"/?"+new URLSearchParams({
     buid: MY_BU_ID
   }),{
@@ -52,7 +52,8 @@ export async function calcAllFinalGrade(classID: string, classTitle: string, cur
       headers: GET_DEFAULT_HEADERS(),
       });
   
-    const student = await studentInfo.json();
+    const student: student = await studentInfo.json();
+    // console.log(student);
     students.push(student);
   }
 
@@ -76,36 +77,40 @@ export async function calcAllFinalGrade(classID: string, classTitle: string, cur
     assignmentsWeight.set(assignment.assignmentId, assignment.weight);
   }
 
-  // console.log(assignmentsWeight.get("A1"));
-
-  let returnList!: oneStudentFinalResult[];
+  let returnList = [];
 
   for(var student of students){
     var totalScore = 0;
-    var grades = Object.entries(student.grades[0]) //grade: A1:80(weight)
+    var grades = Object.entries(student.grades[0]);
     for(var eachGrade of grades){
+
+      // console.log(eachGrade);
+      // console.log(eachGrade[0]+eachGrade[1]);
       var weight = assignmentsWeight.get(eachGrade[0]);
       var assignmentGrade = eachGrade[1];
-      if(typeof eachGrade[1] === "string"){
-        assignmentGrade = parseInt(eachGrade[1]);
-      }
-      if(typeof assignmentGrade === "number"){
-        totalScore += weight*assignmentGrade;
-      }
+      // if(typeof eachGrade.values === "string"){
+        // assignmentGrade = parseInt(eachGrade[1]);
+      // }
+      // if(typeof assignmentGrade === "number"){
+      totalScore += weight*assignmentGrade;
+      // }
     }
     totalScore = totalScore / 100;
-    let o: oneStudentFinalResult,{
-      studentId: student.studentId;
-      studentName: student.name;
-      classId: classID;
-      className: classTitle;
-      semester: currSemester;
-      finalGrade: totalScore;
+    let eachStudentResult: oneStudentFinalResult = {
+      studentId: student.studentId,
+      studentName: student.name,
+      classId: classID,
+      className: classTitle,
+      semester: currSemester,
+      finalGrade: totalScore,
     }
-    returnList.push
+    returnList.push(eachStudentResult);
   }
 
+  // for(var a of returnList){
+  //   console.log(a);
+  // }
 
-  return undefined;
+  return returnList;
 }
 

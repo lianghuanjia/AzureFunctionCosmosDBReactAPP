@@ -5,7 +5,7 @@ import { MenuItem, Select, Typography } from "@mui/material";
  * You will find globals from this file useful!
  */
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "./globals";
-import { IUniversityClass } from "./types/api_types";
+import { IUniversityClass, oneStudentFinalResult } from "./types/api_types";
 import { countReset } from "console";
 import {calcAllFinalGrade} from "./utils/calculate_grade";
 import {GradeTable} from "./components/GradeTable";
@@ -16,36 +16,13 @@ function App() {
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
   const [currClassName, setCurrClassName] = useState<string>("");
   const [currSemester, setCurrSemester] = useState<string>("");
-
-  /**
-   * This is JUST an example of how you might fetch some data(with a different API).
-   * As you might notice, this does not show up in your console right now.
-   * This is because the function isn't called by anything!
-   *
-   * You will need to lookup how to fetch data from an API using React.js
-   * Something you might want to look at is the useEffect hook.
-   *
-   * The useEffect hook will be useful for populating the data in the dropdown box.
-   * You will want to make sure that the effect is only called once at component mount.
-   *
-   * You will also need to explore the use of async/await.
-   *
-   */
-  const fetchSomeData = async () => {
-    const res = await fetch("https://cat-fact.herokuapp.com/facts/", {
-      method: "GET",
-    });
-    const json = await res.json();
-    console.log(json);
-  };
+  const [classAllStudentFinalGrade, setClassAllStudentFinalGrade] = useState<oneStudentFinalResult[]>([]);
 
 
 
-  //class/listBySemester/{semester}
   const listBySemester = async () => {
     var semester = "fall2022";
     setCurrSemester(semester);
-    //https://dscs519-assessment.azurewebsites.net/api/class/listBySemester/fall2022?buid=U62794192
     const response = await fetch(BASE_API_URL+CLASS_URL+"listBySemester/"+semester+"?"+new URLSearchParams({
       buid: MY_BU_ID
     }),{
@@ -57,7 +34,6 @@ function App() {
     })
 
     const data = await response.json()
-    console.log(data)
     setClassList(data)
   }
 
@@ -71,7 +47,6 @@ function App() {
       });
 
     const data = await response.json()
-    console.log(data)
   }
 
 
@@ -81,8 +56,14 @@ function App() {
 
   useEffect(() => {
     // run something every time name changes
-    const result = calcAllFinalGrade(currClassId, currClassName, currSemester); //use props to pass the result to component GradeTable
+    calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
+      setClassAllStudentFinalGrade(value); //This is a fulfilled promise  👈
+    }); //use props to pass the result to component GradeTable
   }, [currClassId]);
+
+  // useEffect(()=>{
+  //   console.log(classAllStudentFinalGrade);
+  // }, [classAllStudentFinalGrade]);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
@@ -116,11 +97,11 @@ function App() {
           <Typography variant="h4" gutterBottom>
             Final Grades
           </Typography>
-          <div><GradeTable /></div>
+          <div>{GradeTable(classAllStudentFinalGrade)}</div>
         </Grid>
       </Grid>
     </div>
   );
 }
-
+//<GradeTable />
 export default App;
