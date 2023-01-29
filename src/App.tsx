@@ -57,13 +57,10 @@ function App() {
   useEffect(() => {
     // run something every time name changes
     calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
-      setClassAllStudentFinalGrade(value); //This is a fulfilled promise  👈
+      setClassAllStudentFinalGrade(value);
     }); //use props to pass the result to component GradeTable
   }, [currClassId]);
 
-  // useEffect(()=>{
-  //   console.log(classAllStudentFinalGrade);
-  // }, [classAllStudentFinalGrade]);
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>

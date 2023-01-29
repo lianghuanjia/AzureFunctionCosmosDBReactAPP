@@ -23,6 +23,20 @@ export async function calculateStudentFinalGrade(
   return undefined;
 }
 
+export async function getAllStudentsWithOneClassID(classID: string): Promise<string[]>{
+  const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+classID+"/?"+new URLSearchParams({
+    buid: MY_BU_ID
+  }),{
+    method: 'GET',
+    headers: GET_DEFAULT_HEADERS(),
+    });
+
+  const data = await response.json()
+  console.log(data);
+  return data
+}
+
+
 /**
  * You need to write this function! You might want to write more functions to make the code easier to read as well.
  * 
@@ -32,19 +46,21 @@ export async function calculateStudentFinalGrade(
  * @returns Some data structure that has a list of each student and their final grade.
  */
 export async function calcAllFinalGrade(classID: string, classTitle: string, currSemester: string): Promise<oneStudentFinalResult[]> {
-  const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+classID+"/?"+new URLSearchParams({
-    buid: MY_BU_ID
-  }),{
-    method: 'GET',
-    headers: GET_DEFAULT_HEADERS(),
-    });
+  
+  const studentIDs = await getAllStudentsWithOneClassID(classID);
+  
+  // const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+classID+"/?"+new URLSearchParams({
+  //   buid: MY_BU_ID
+  // }),{
+  //   method: 'GET',
+  //   headers: GET_DEFAULT_HEADERS(),
+  //   });
 
-  const data = await response.json()
+  // const data = await response.json()
 
-  //use a list to store all the data and return it.
 
   var students = [];
-  for (var studentID of data) {
+  for (var studentID of studentIDs) {
     const studentInfo = await fetch(BASE_API_URL+STUDENT_URL+"listGrades/"+studentID+"/"+classID+"/?"+new URLSearchParams({
       buid: MY_BU_ID
     }),{
@@ -53,15 +69,8 @@ export async function calcAllFinalGrade(classID: string, classTitle: string, cur
       });
   
     const student: student = await studentInfo.json();
-    // console.log(student);
     students.push(student);
   }
-
-  // console.log(students)
-
-  // for(var student in students){
-  //   console.log(student)
-  // }
 
   let assignmentsWeight = new Map();
   const res = await fetch(BASE_API_URL+CLASS_URL+"listAssignments/"+classID+"/?"+new URLSearchParams({
@@ -83,17 +92,11 @@ export async function calcAllFinalGrade(classID: string, classTitle: string, cur
     var totalScore = 0;
     var grades = Object.entries(student.grades[0]);
     for(var eachGrade of grades){
-
-      // console.log(eachGrade);
-      // console.log(eachGrade[0]+eachGrade[1]);
       var weight = assignmentsWeight.get(eachGrade[0]);
       var assignmentGrade = eachGrade[1];
-      // if(typeof eachGrade.values === "string"){
-        // assignmentGrade = parseInt(eachGrade[1]);
-      // }
-      // if(typeof assignmentGrade === "number"){
+
       totalScore += weight*assignmentGrade;
-      // }
+
     }
     totalScore = totalScore / 100;
     let eachStudentResult: oneStudentFinalResult = {
@@ -106,10 +109,6 @@ export async function calcAllFinalGrade(classID: string, classTitle: string, cur
     }
     returnList.push(eachStudentResult);
   }
-
-  // for(var a of returnList){
-  //   console.log(a);
-  // }
 
   return returnList;
 }

@@ -25,22 +25,31 @@ export const GradeTable = (infoList: oneStudentFinalResult[]) => {
     console.log(a);
   }
 
+  const items = [];
+        for (const student of infoList) {
+            items.push(<tr key = {student.studentId}>
+                <td> { student.studentName} </td>   
+                <td> {student.classId}</td>
+                <td> {student.className}</td>
+                <td> {student.semester}</td>
+                <td> {student.finalGrade}</td>
+            </tr>)
+        }
+
   return (
   <table >
-  <tr>
-    <th>Student</th>
-    <th>Contact</th>
-    <th>Country</th>
-  </tr>
-  <tr>
-    <td>Alfreds Futterkiste</td>
-    <td>Maria Anders</td>
-    <td>Germany</td>
-  </tr>
-  <tr>
-    <td>Centro comercial Moctezuma</td>
-    <td>Francisco Chang</td>
-    <td>Mexico</td>
-  </tr>
+    <thead>
+      <tr>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Class ID</th>
+        <th>Class Name</th>
+        <th>Semester</th>
+        <th>Final Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {items}
+    </tbody>
 </table>);
 };
