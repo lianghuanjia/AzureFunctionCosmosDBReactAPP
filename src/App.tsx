@@ -5,7 +5,7 @@ import { MenuItem, Select, Typography } from "@mui/material";
  * You will find globals from this file useful!
  */
 import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "./globals";
-import { IUniversityClass, oneStudentFinalResult } from "./types/api_types";
+import { IUniversityClass, IOneStudentFinalResult } from "./types/api_types";
 import { countReset } from "console";
 import {calcAllFinalGrade} from "./utils/calculate_grade";
 import {GradeTable} from "./components/GradeTable";
@@ -16,10 +16,33 @@ function App() {
   const [classList, setClassList] = useState<IUniversityClass[]>([]);
   const [currClassName, setCurrClassName] = useState<string>("");
   const [currSemester, setCurrSemester] = useState<string>("");
-  const [classAllStudentFinalGrade, setClassAllStudentFinalGrade] = useState<oneStudentFinalResult[]>([]);
+  const [classAllStudentFinalGrade, setClassAllStudentFinalGrade] = useState<IOneStudentFinalResult[]>([]);
 
+  /**
+   * It calss the listBySemester when the program runs to get all the classIDs in the semester specified in
+   * the listBySemester()
+   */
+  useEffect(() => {
+    listBySemester();
+  }, []);
 
+  /**
+   * Whenever the currClassId is changed(i.e., the user select a class to get its students final grades from the select drop down menu),
+   * it will run setClassAllStudentFinalGrade() to calculate all the students' final grades in the class that matches the
+   * currClassId, and it will use setClassAllStudentFinalGrade(value) to put all the display information to classAllStudentFinalGrade,
+   * so that GradeTable component will use the classAllStudentFinalGrade to display all the students, their fianl grades, and other information
+   * we want on the website.
+   */
+  useEffect(() => {
+    calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
+      setClassAllStudentFinalGrade(value);
+    });
+  }, [currClassId]);
 
+  /**
+   * listBySemester is to given a semester, it returns all the class's ID in that semester, and set the 
+   * global variable classList. This functino will be called when the program runs because it is in the useEffect.
+   */
   const listBySemester = async () => {
     var semester = "fall2022";
     setCurrSemester(semester);
@@ -37,31 +60,6 @@ function App() {
     setClassList(data)
   }
 
-  //class/listStudents/{classId}
-  const listStudentsByClassId = async () => {
-    const response = await fetch(BASE_API_URL+CLASS_URL+"listStudents/"+currClassId+"/?"+new URLSearchParams({
-      buid: MY_BU_ID
-    }),{
-      method: 'GET',
-      headers: GET_DEFAULT_HEADERS(),
-      });
-
-    const data = await response.json()
-  }
-
-
-  useEffect(() => {
-    listBySemester();
-  }, []);
-
-  useEffect(() => {
-    // run something every time name changes
-    calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
-      setClassAllStudentFinalGrade(value);
-    }); //use props to pass the result to component GradeTable
-  }, [currClassId]);
-
-
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <Grid container spacing={2} style={{ padding: "1rem" }}>
@@ -75,16 +73,15 @@ function App() {
             Select a class
           </Typography>
           <div style={{ width: "100%" }}>
-            <Select fullWidth={true} label="Class" onChange={(e) => {
+            <Select fullWidth={true} label="Class" defaultValue={{ label: "Select A Class", value: 0 }} onChange={(e) => {
               const selectedValue = e.target.value
               const selectedClass = classList.filter(c => c.classId === selectedValue)[0]
-              console.log(selectedClass.classId)
               setCurrClassId(selectedClass.classId)
               setCurrClassName(selectedClass.title)
             }}>
             {classList.map((IUniversityClass) => 
               <MenuItem key={IUniversityClass.title} value={IUniversityClass.classId}>
-                {IUniversityClass.classId}
+                {IUniversityClass.title}
               </MenuItem>
             )}
             </Select>
@@ -100,5 +97,4 @@ function App() {
     </div>
   );
 }
-//<GradeTable />
 export default App;

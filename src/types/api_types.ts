@@ -24,32 +24,32 @@ export interface IUniversityClass {
 // A3: number,
 // A4: number,
 // A5: number
-export interface student{
+export interface IStudent{
   classId: string;
   studentId: string;
   name: string;
   grades: Map<string,number>[];
 }
 
-export interface assignment{
+export interface IAssignment{
   assignmentId: string,
   classId: string,
   date: string,
   weight: number
 }
 
-export interface grade{
+export interface IGrade{
   assignmentName: string;
   score: string;
 }
 
-export interface assignmentWeight{
+export interface IAssignmentWeight{
   assignmentID: string;
   classId: string;
   weight: BigInt;
 }
 
-export interface oneStudentFinalResult{
+export interface IOneStudentFinalResult{
   studentId: string;
   studentName: string;
   classId: string;

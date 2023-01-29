@@ -1,4 +1,5 @@
-import {oneStudentFinalResult} from "../types/api_types";
+import {IOneStudentFinalResult} from "../types/api_types";
+import "./GradeTable.css";
 
 
 /**
@@ -13,22 +14,16 @@ export function dummyData() {
 }
 
 /**
- * This is the component where you should write the code for displaying the
- * the table of grades.
- *
- * You might need to change the signature of this function.
- *
- * This is a component, need to apply it to the div below the typography in the App.tsx
- */ 
-export const GradeTable = (infoList: oneStudentFinalResult[]) => {
-  for(var a of infoList){
-    console.log(a);
-  }
-
+ * This function takes a list of IOneStudentFinalResult interface, and display each IOneStudentFinalResult's information on the website
+ * @param infoList :list of IOneStudentFinalResult interface. IOneStudentFinalResult contains all the information of a student that we want to display on the website
+ * @returns a component that contains all the students and their information that we want to display on the website.
+ */
+export const GradeTable = (infoList: IOneStudentFinalResult[]) => {
   const items = [];
         for (const student of infoList) {
             items.push(<tr key = {student.studentId}>
-                <td> { student.studentName} </td>   
+                <td> {student.studentId}</td>
+                <td> {student.studentName}</td>   
                 <td> {student.classId}</td>
                 <td> {student.className}</td>
                 <td> {student.semester}</td>
@@ -37,15 +32,15 @@ export const GradeTable = (infoList: oneStudentFinalResult[]) => {
         }
 
   return (
-  <table >
+  <table>
     <thead>
       <tr>
-        <th>Student ID</th>
-        <th>Student Name</th>
-        <th>Class ID</th>
-        <th>Class Name</th>
-        <th>Semester</th>
-        <th>Final Grade</th>
+        <th>Student ID | </th>
+        <th>Student Name |</th>
+        <th>Class ID | </th>
+        <th>Class Name | </th>
+        <th>Semester | </th>
+        <th>Final Grade | </th>
       </tr>
     </thead>
     <tbody>
