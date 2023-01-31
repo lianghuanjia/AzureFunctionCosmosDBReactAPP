@@ -34,9 +34,13 @@ function App() {
    * we want on the website.
    */
   useEffect(() => {
-    calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
-      setClassAllStudentFinalGrade(value);
-    });
+    if (currClassId !== '') {
+      calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
+        setClassAllStudentFinalGrade(value);
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
   }, [currClassId]);
 
   /**
