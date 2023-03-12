@@ -1,4 +1,4 @@
-import {IOneStudentFinalResult} from "../types/api_types";
+import { IHttpResponse } from "../types/api_types";
 import "./GradeTable.css";
 
 
@@ -18,33 +18,60 @@ export function dummyData() {
  * @param infoList :list of IOneStudentFinalResult interface. IOneStudentFinalResult contains all the information of a student that we want to display on the website
  * @returns a component that contains all the students and their information that we want to display on the website.
  */
-export const GradeTable = (infoList: IOneStudentFinalResult[]) => {
-  const items = [];
-        for (const student of infoList) {
-            items.push(<tr key = {student.studentId}>
-                <td> {student.studentId}</td>
-                <td> {student.studentName}</td>   
-                <td> {student.classId}</td>
-                <td> {student.className}</td>
-                <td> {student.semester}</td>
-                <td> {student.finalGrade}</td>
-            </tr>)
-        }
+export const GradeTable = (response: string) => {
+  var jsonObj = null
+  if (response !== ""){
+    console.log(response)
+    jsonObj = JSON.parse(response)
+    if(jsonObj.apiType === 'GET'){
+
+    const items = [];
+      for (const shipment of jsonObj.message.Received) {
+        //key = {jsonObj.message}
+        items.push(<tr>   
+            <td> {shipment.Date}</td>
+            <td> {shipment.WarehouseID}</td>   
+            <td> {shipment.ShippingPO}</td>
+            <td> {shipment.ShipmentID}</td>
+            <td> {shipment.BoxesRcvd}</td>
+        </tr>)
+      }
+      return (
+        <table>
+          <thead>
+            <tr>
+              <th>Date  </th>
+              <th>Warehouse ID  </th>
+              <th>Shipping PO  </th>
+              <th>Shipment ID  </th>
+              <th>Boxes Received  </th>
+            </tr>
+          </thead>
+          <tbody>
+            {items}
+          </tbody>
+      </table>);
+  }
+  else{
+    const items = []
+    // key = {jsonObj.message}
+    items.push(<tr>
+      <td> {jsonObj.message}</td>
+    </tr>)
 
   return (
   <table>
     <thead>
       <tr>
-        <th>Student ID | </th>
-        <th>Student Name |</th>
-        <th>Class ID | </th>
-        <th>Class Name | </th>
-        <th>Semester | </th>
-        <th>Final Grade | </th>
+        <th>Message </th>
       </tr>
     </thead>
     <tbody>
       {items}
     </tbody>
 </table>);
+  }
+}
+
+
 };

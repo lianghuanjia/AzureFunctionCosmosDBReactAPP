@@ -4,64 +4,55 @@ import { MenuItem, Select, Typography } from "@mui/material";
 /**
  * You will find globals from this file useful!
  */
-import { BASE_API_URL, CLASS_URL, GET_DEFAULT_HEADERS, MY_BU_ID, STUDENT_URL, TOKEN } from "./globals";
-import { IUniversityClass, IOneStudentFinalResult } from "./types/api_types";
-import { countReset } from "console";
-import {calcAllFinalGrade} from "./utils/calculate_grade";
+import { BASE_API_URL, CLASS_URL, GET_HEADERS, POST_HEADERS, STUDENT_URL} from "./globals";
 import {GradeTable} from "./components/GradeTable";
+import { IHttpResponse } from "./types/api_types";
 
 function App() {
   // You will need to use more of these!
-  const [currClassId, setCurrClassId] = useState<string>("");
-  const [classList, setClassList] = useState<IUniversityClass[]>([]);
-  const [currClassName, setCurrClassName] = useState<string>("");
-  const [currSemester, setCurrSemester] = useState<string>("");
-  const [classAllStudentFinalGrade, setClassAllStudentFinalGrade] = useState<IOneStudentFinalResult[]>([]);
+  const verticalStyle = { display: 'flex', justifyContent: 'left', alignItems: 'left', width: '100%'}
+  const [message, setMessage] = useState<string>("");
+  const [key, setKey] = useState<string>("");
 
-  /**
-   * It calss the listBySemester when the program runs to get all the classIDs in the semester specified in
-   * the listBySemester()
-   */
-  useEffect(() => {
-    listBySemester();
-  }, []);
-
-  /**
-   * Whenever the currClassId is changed(i.e., the user select a class to get its students final grades from the select drop down menu),
-   * it will run setClassAllStudentFinalGrade() to calculate all the students' final grades in the class that matches the
-   * currClassId, and it will use setClassAllStudentFinalGrade(value) to put all the display information to classAllStudentFinalGrade,
-   * so that GradeTable component will use the classAllStudentFinalGrade to display all the students, their fianl grades, and other information
-   * we want on the website.
-   */
-  useEffect(() => {
-    if (currClassId !== '') {
-      calcAllFinalGrade(currClassId, currClassName, currSemester).then((value) => {
-        setClassAllStudentFinalGrade(value);
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [currClassId]);
+  useEffect(()=>{
+    var keyConfig = require("./key.json");
+    setKey(keyConfig.TOKEN);
+  },[]);
 
   /**
    * listBySemester is to given a semester, it returns all the class's ID in that semester, and set the 
    * global variable classList. This functino will be called when the program runs because it is in the useEffect.
    */
-  const listBySemester = async () => {
-    var semester = "fall2022";
-    setCurrSemester(semester);
-    const response = await fetch(BASE_API_URL+CLASS_URL+"listBySemester/"+semester+"?"+new URLSearchParams({
-      buid: MY_BU_ID
-    }),{
+  const addShipment = async () => {
+    let body = {
+        "shipperId": (document.getElementById("postShipperId") as HTMLInputElement).value,
+        "Date": (document.getElementById("date") as HTMLInputElement).value,
+        "WarehouseID": (document.getElementById("warehouseId") as HTMLInputElement).value,
+        "ShippingPO": (document.getElementById("shippingPO") as HTMLInputElement).value,
+        "ShipmentID": (document.getElementById("shipmentId") as HTMLInputElement).value,
+        "BoxesRcvd": (document.getElementById("numBoxesRecv") as HTMLInputElement).value
+    }
+    const response = await fetch("https://functionsinportal.azurewebsites.net/api/HttpTrigger1",{
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: POST_HEADERS(key)
+    })
+    var data: IHttpResponse = await response.json()
+    data.apiType="POST"
+    setMessage(JSON.stringify(data))
+  }
+
+  const getShipment = async () => {
+    var shipperId: string = (document.getElementById("getShipperId") as HTMLInputElement).value
+    const response = await fetch("https://functionsinportal.azurewebsites.net/api/getShipments?&shipperId="+shipperId,
+    {
       method: 'GET',
-      headers: {
-        'Content-Type':'application/json',
-        'x-functions-key': TOKEN
-      },
+      headers: GET_HEADERS(key)
     })
 
-    const data = await response.json()
-    setClassList(data)
+    var data: IHttpResponse = await response.json()
+    data.apiType="GET"
+    setMessage(JSON.stringify(data))
   }
 
   return (
@@ -69,33 +60,42 @@ function App() {
       <Grid container spacing={2} style={{ padding: "1rem" }}>
         <Grid xs={12} container alignItems="center" justifyContent="center">
           <Typography variant="h2" gutterBottom>
-            Spark Assessment
+            Warehouse Automation
           </Typography>
         </Grid>
         <Grid xs={12} md={4}>
-          <Typography variant="h4" gutterBottom>
-            Select a class
+          <Typography variant="h5" gutterBottom>
+            Enter shipment information to upload:
           </Typography>
-          <div style={{ width: "100%" }}>
-            <Select fullWidth={true} label="Class" defaultValue={{ label: "Select A Class", value: 0 }} onChange={(e) => {
-              const selectedValue = e.target.value
-              const selectedClass = classList.filter(c => c.classId === selectedValue)[0]
-              setCurrClassId(selectedClass.classId)
-              setCurrClassName(selectedClass.title)
-            }}>
-            {classList.map((IUniversityClass) => 
-              <MenuItem key={IUniversityClass.title} value={IUniversityClass.classId}>
-                {IUniversityClass.title}
-              </MenuItem>
-            )}
-            </Select>
-          </div>
+                      
+          <div style={verticalStyle}>ShipperId</div>
+          <div style={verticalStyle}><input type="text" id="postShipperId" name="postShipperId"></input></div>
+          <div style={verticalStyle}>Date: </div>
+          <div style={verticalStyle}><input type="text" id="date" name="date"></input></div>    
+          <div style={verticalStyle}>Warehouse ID:</div>
+          <div style={verticalStyle}><input type="text" id="warehouseId" name="warehouseId"></input></div>   
+          <div style={verticalStyle}>shipping PO: </div>
+          <div style={verticalStyle}><input type="text" id="shippingPO" name="shippingPO"></input></div>  
+          <div style={verticalStyle}>Shipment ID: </div>
+          <div style={verticalStyle}><input type="text" id="shipmentId" name="shipmentId"></input></div>  
+          <div style={verticalStyle}># Boxes Received ID: </div>
+          <div style={verticalStyle}><input type="text" id="numBoxesRecv" name="numBoxesRecv"></input></div>  
+          <div style={verticalStyle}><button type="button" onClick={addShipment}>Add shipment to inventory</button></div>
+          <div style={verticalStyle}><p>                 </p></div>
+
+
+          <Typography variant="h5" gutterBottom>
+            Enter shipperId to look up:
+          </Typography>
+          <div style={verticalStyle}>Shipper ID</div>
+          <div style={verticalStyle}><input type="text" id="getShipperId" name="getShipperId"></input></div>  
+          <div style={verticalStyle}><button type="button" onClick={getShipment}>Get shipments information</button></div>
         </Grid>
         <Grid xs={12} md={8}>
           <Typography variant="h4" gutterBottom>
-            Final Grades
+            Results
           </Typography>
-          <div>{GradeTable(classAllStudentFinalGrade)}</div>
+          <div>{GradeTable(message)}</div>
         </Grid>
       </Grid>
     </div>

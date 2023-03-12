@@ -49,13 +49,14 @@ export interface IAssignmentWeight{
   weight: BigInt;
 }
 
-export interface IOneStudentFinalResult{
-  studentId: string;
-  studentName: string;
-  classId: string;
-  className: string;
-  semester: string;
-  finalGrade: number;
+export interface IHttpResponse{
+  status: string;
+  message:string;
+  apiType:string;
+}
+
+export interface IToken{
+  TOKEN: string;
 }
 
 
