@@ -44,6 +44,9 @@ function App() {
 
   const getShipment = async () => {
     var shipperId: string = (document.getElementById("getShipperId") as HTMLInputElement).value
+    if (shipperId === null){
+      shipperId = ""
+    }
     const response = await fetch("https://functionsinportal.azurewebsites.net/api/getShipments?&shipperId="+shipperId,
     {
       method: 'GET',

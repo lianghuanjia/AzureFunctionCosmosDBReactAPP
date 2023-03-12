@@ -24,8 +24,26 @@ export const GradeTable = (response: string) => {
     console.log(response)
     jsonObj = JSON.parse(response)
     if(jsonObj.apiType === 'GET'){
-
-    const items = [];
+      if(jsonObj.status !== "200"){
+        const items = []
+        items.push(<tr>
+          <td> {jsonObj.message}</td>
+        </tr>)
+    
+      return (
+      <table>
+        <thead>
+          <tr>
+            <th>Message </th>
+          </tr>
+        </thead>
+        <tbody>
+          {items}
+        </tbody>
+      </table>);
+      }
+    else{
+      const items = [];
       for (const shipment of jsonObj.message.Received) {
         //key = {jsonObj.message}
         items.push(<tr>   
@@ -51,7 +69,9 @@ export const GradeTable = (response: string) => {
             {items}
           </tbody>
       </table>);
-  }
+      }
+    }
+    
   else{
     const items = []
     // key = {jsonObj.message}
